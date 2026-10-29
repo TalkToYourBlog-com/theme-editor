@@ -4,7 +4,7 @@ Tags: abilities api, mcp, ai, theme editor, developer tools
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,9 @@ No data about the site or its users is sent anywhere by this plugin. Revisions s
 The full, human-readable source of this plugin is public: https://github.com/TalkToYourBlog-com/theme-editor.
 
 == Changelog ==
+
+= 0.6.1 =
+* Fixed restore-revision failing to undo a delete-file call ("That file does not exist"): it now re-creates a missing file instead of requiring the file to already exist.
 
 = 0.6.0 =
 * create-theme (renamed from create-folder) now builds themes as independent folders directly under wp-content/themes, instead of nested inside whichever theme happens to be active -- the AI-built theme is now a real, separate, independently activatable theme that survives switching the active theme, and shows up under Appearance > Themes right away.

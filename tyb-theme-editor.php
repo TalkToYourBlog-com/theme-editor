@@ -4,7 +4,7 @@
  * Plugin Name:       TalkToYourBlog Theme Editor
  * Plugin URI:        https://github.com/TalkToYourBlog-com/theme-editor
  * Description:       Optional companion for TalkToYourBlog. Lets an AI app create and edit its own, independent WordPress themes through the WordPress Abilities API -- never an existing theme. Not required for TalkToYourBlog to work.
- * Version:           0.6.0
+ * Version:           0.6.1
  * Requires at least: 6.9
  * Requires PHP:      7.4
  * Author:            Michal Futera
@@ -16,7 +16,7 @@
 
 defined('ABSPATH') || exit;
 
-define('TYB_THEME_EDITOR_VERSION', '0.6.0');
+define('TYB_THEME_EDITOR_VERSION', '0.6.1');
 define('TYB_THEME_EDITOR_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TYB_THEME_EDITOR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('TYB_THEME_EDITOR_INCLUDES_DIR', TYB_THEME_EDITOR_PLUGIN_DIR . 'includes');

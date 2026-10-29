@@ -346,12 +346,12 @@ add_action('wp_abilities_api_init', function () {
 
     wp_register_ability('tyb-theme-editor/restore-revision', [
         'label' => __('Restore a file to a previous version', 'tyb-theme-editor'),
-        'description' => __("Writes a previous revision's content back to its file. The file's current content is itself snapshotted first, so a restore can always be undone the same way.", 'tyb-theme-editor'),
+        'description' => __("Writes a previous revision's content back to its file, re-creating it if delete-file removed it. The file's current content is itself snapshotted first when it exists, so a restore can always be undone the same way.", 'tyb-theme-editor'),
         'category' => 'tyb-theme-editor',
         'input_schema' => [
             'type' => 'object',
             'properties' => [
-                'revision_id' => ['type' => 'integer', 'description' => 'An id returned by list-revisions or by a prior update-file call.'],
+                'revision_id' => ['type' => 'integer', 'description' => 'An id returned by list-revisions, or by a prior update-file or delete-file call.'],
             ],
             'required' => ['revision_id'],
             'additionalProperties' => false,
@@ -362,7 +362,7 @@ add_action('wp_abilities_api_init', function () {
                 'success' => ['type' => 'boolean'],
                 'path' => ['type' => 'string'],
                 'hash' => ['type' => 'string'],
-                'backup_revision_id' => ['type' => 'integer', 'description' => 'The id of the new revision created from the content this restore just replaced.'],
+                'backup_revision_id' => ['type' => ['integer', 'null'], 'description' => 'The id of the new revision created from the content this restore just replaced, or null when the file did not exist (e.g. restoring something delete-file removed).'],
             ],
         ],
         'execute_callback' => tyb_theme_editor_logged_ability('restore-revision', function ($input) {
@@ -371,7 +371,10 @@ add_action('wp_abilities_api_init', function () {
                 return $revision;
             }
 
-            $resolved = tyb_theme_editor_resolve_path($revision['path'], true);
+            // must_exist is false: a restore has to work whether it is undoing an edit (the
+            // file is still there) or undoing a delete-file call (the file is gone and this
+            // call needs to re-create it).
+            $resolved = tyb_theme_editor_resolve_path($revision['path'], false);
             if (is_wp_error($resolved)) {
                 return $resolved;
             }
@@ -383,14 +386,16 @@ add_action('wp_abilities_api_init', function () {
             }
 
             $relative_path = tyb_theme_editor_relative_path($resolved);
-            $current_content = file_get_contents($resolved);
-            if ($current_content === false) {
-                return new WP_Error('tyb_theme_editor_read_failed', __('The file could not be read.', 'tyb-theme-editor'));
-            }
-
-            $backup_revision_id = tyb_theme_editor_save_revision($relative_path, $current_content);
-            if (is_wp_error($backup_revision_id)) {
-                return $backup_revision_id;
+            $backup_revision_id = null;
+            if (file_exists($resolved)) {
+                $current_content = file_get_contents($resolved);
+                if ($current_content === false) {
+                    return new WP_Error('tyb_theme_editor_read_failed', __('The file could not be read.', 'tyb-theme-editor'));
+                }
+                $backup_revision_id = tyb_theme_editor_save_revision($relative_path, $current_content);
+                if (is_wp_error($backup_revision_id)) {
+                    return $backup_revision_id;
+                }
             }
 
             if (file_put_contents($resolved, $revision['content']) === false) {

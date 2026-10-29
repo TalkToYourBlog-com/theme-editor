@@ -63,8 +63,9 @@ function tyb_theme_editor_list_revisions($relative_path, $limit = 50) {
         'posts_per_page' => max(1, min(200, (int) $limit)),
         'orderby' => 'date',
         'order' => 'DESC',
-        'meta_key' => '_tyb_path',
-        'meta_value' => $relative_path,
+        'meta_query' => [
+            ['key' => '_tyb_path', 'value' => $relative_path],
+        ],
         'no_found_rows' => true,
     ]);
 

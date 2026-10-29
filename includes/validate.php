@@ -28,7 +28,7 @@ function tyb_theme_editor_lint_php($content) {
             file_put_contents($tmp, $content);
             $php_binary = defined('PHP_BINARY') && PHP_BINARY ? PHP_BINARY : 'php';
             $output = shell_exec(escapeshellcmd($php_binary) . ' -l ' . escapeshellarg($tmp) . ' 2>&1');
-            @unlink($tmp);
+            wp_delete_file($tmp);
             if (is_string($output)) {
                 return strpos($output, 'No syntax errors detected') !== false
                     ? true

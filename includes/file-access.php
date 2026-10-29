@@ -159,64 +159,49 @@ function tyb_theme_editor_starter_theme_files($slug, $fn_prefix) {
     $display_name = tyb_theme_editor_display_name_from_slug($slug);
 
     return [
-        'style.css' => <<<CSS
-/*
-Theme Name: {$display_name}
-Description: Independent WordPress theme created by an AI app through TalkToYourBlog (talktoyourblog.com).
-Version: 1.0.0
-*/
-
-CSS,
-        'functions.php' => <<<PHP
-<?php
-defined('ABSPATH') || exit;
-
-add_action('after_setup_theme', function () {
-    add_theme_support('title-tag');
-    add_theme_support('post-thumbnails');
-});
-
-add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_style('{$slug}-style', get_stylesheet_uri(), [], wp_get_theme()->get('Version'));
-});
-
-PHP,
-        'header.php' => <<<PHP
-<?php defined('ABSPATH') || exit; ?>
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-<meta charset="<?php bloginfo('charset'); ?>">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<?php wp_head(); ?>
-</head>
-<body <?php body_class(); ?>>
-<?php wp_body_open(); ?>
-
-PHP,
-        'footer.php' => <<<PHP
-<?php defined('ABSPATH') || exit; ?>
-<?php wp_footer(); ?>
-</body>
-</html>
-
-PHP,
-        'index.php' => <<<PHP
-<?php
-defined('ABSPATH') || exit;
-get_header();
-?>
-<main>
-<?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-<h1><?php the_title(); ?></h1>
-<?php the_content(); ?>
-</article>
-<?php endwhile; endif; ?>
-</main>
-<?php get_footer(); ?>
-
-PHP,
+        'style.css' => "/*\n"
+            . "Theme Name: {$display_name}\n"
+            . "Description: Independent WordPress theme created by an AI app through TalkToYourBlog (talktoyourblog.com).\n"
+            . "Version: 1.0.0\n"
+            . "*/\n",
+        'functions.php' => "<?php\n"
+            . "defined('ABSPATH') || exit;\n"
+            . "\n"
+            . "add_action('after_setup_theme', function () {\n"
+            . "    add_theme_support('title-tag');\n"
+            . "    add_theme_support('post-thumbnails');\n"
+            . "});\n"
+            . "\n"
+            . "add_action('wp_enqueue_scripts', function () {\n"
+            . "    wp_enqueue_style('{$slug}-style', get_stylesheet_uri(), [], wp_get_theme()->get('Version'));\n"
+            . "});\n",
+        'header.php' => "<?php defined('ABSPATH') || exit; ?>\n"
+            . "<!DOCTYPE html>\n"
+            . "<html <?php language_attributes(); ?>>\n"
+            . "<head>\n"
+            . "<meta charset=\"<?php bloginfo('charset'); ?>\">\n"
+            . "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+            . "<?php wp_head(); ?>\n"
+            . "</head>\n"
+            . "<body <?php body_class(); ?>>\n"
+            . "<?php wp_body_open(); ?>\n",
+        'footer.php' => "<?php defined('ABSPATH') || exit; ?>\n"
+            . "<?php wp_footer(); ?>\n"
+            . "</body>\n"
+            . "</html>\n",
+        'index.php' => "<?php\n"
+            . "defined('ABSPATH') || exit;\n"
+            . "get_header();\n"
+            . "?>\n"
+            . "<main>\n"
+            . "<?php if (have_posts()) : while (have_posts()) : the_post(); ?>\n"
+            . "<article id=\"post-<?php the_ID(); ?>\" <?php post_class(); ?>>\n"
+            . "<h1><?php the_title(); ?></h1>\n"
+            . "<?php the_content(); ?>\n"
+            . "</article>\n"
+            . "<?php endwhile; endif; ?>\n"
+            . "</main>\n"
+            . "<?php get_footer(); ?>\n",
     ];
 }
 
@@ -366,7 +351,8 @@ function tyb_theme_editor_delete_file($relative_path) {
         return $revision_id;
     }
 
-    if (!unlink($resolved)) {
+    wp_delete_file($resolved);
+    if (file_exists($resolved)) {
         return new WP_Error('tyb_theme_editor_delete_failed', __('The file could not be deleted (check folder permissions).', 'tyb-theme-editor'));
     }
 

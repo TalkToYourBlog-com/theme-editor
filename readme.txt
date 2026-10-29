@@ -2,13 +2,13 @@
 Contributors: mjfutera
 Tags: abilities api, mcp, ai, theme editor, developer tools
 Requires at least: 6.9
-Tested up to: 6.9
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Optional companion for TalkToYourBlog: lets an AI app build its own, independent WordPress themes -- PHP, CSS, JS and images -- never an existing theme.
+Optional companion for TalkToYourBlog: lets an AI app build its own, independent WordPress themes -- never an existing theme.
 
 == Description ==
 
@@ -80,6 +80,9 @@ No data about the site or its users is sent anywhere by this plugin. Revisions s
 The full, human-readable source of this plugin is public: https://github.com/TalkToYourBlog-com/theme-editor.
 
 == Changelog ==
+
+= 1.0.1 =
+* Fixed every issue flagged by the official Plugin Check tool ahead of the WordPress.org submission: replaced `unlink()` with `wp_delete_file()`, replaced heredoc strings with plain PHP strings, switched a revision lookup from `meta_key`/`meta_value` to `meta_query`, updated "Tested up to", and shortened the short description.
 
 = 1.0.0 =
 * create-theme now turns the folder name into a readable Theme Name (e.g. "ai-landing-page" becomes "AI Landing Page") and adds a Description crediting TalkToYourBlog (talktoyourblog.com), and seeds a starting screenshot.png so the new theme doesn't show up blank in Appearance > Themes. All of it can be changed afterwards with update-file / upload-image.

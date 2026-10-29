@@ -5,49 +5,49 @@
 
 defined('ABSPATH') || exit;
 
-function talktoyourblog_theme_editor_register_admin_menu() {
+function tyb_theme_editor_register_admin_menu() {
     add_menu_page(
-        __('TalkToYourBlog Theme Editor', 'talktoyourblog-theme-editor'),
-        __('Theme Editor', 'talktoyourblog-theme-editor'),
+        __('TalkToYourBlog Theme Editor', 'tyb-theme-editor'),
+        __('Theme Editor', 'tyb-theme-editor'),
         'edit_themes',
-        'talktoyourblog-theme-editor',
-        'talktoyourblog_theme_editor_render_log_page',
+        'tyb-theme-editor',
+        'tyb_theme_editor_render_log_page',
         'dashicons-media-code',
         81
     );
 }
 
-add_action('admin_menu', 'talktoyourblog_theme_editor_register_admin_menu');
+add_action('admin_menu', 'tyb_theme_editor_register_admin_menu');
 
-function talktoyourblog_theme_editor_admin_enqueue_assets($hook_suffix) {
-    if (strpos((string) $hook_suffix, 'talktoyourblog-theme-editor') === false) {
+function tyb_theme_editor_admin_enqueue_assets($hook_suffix) {
+    if (strpos((string) $hook_suffix, 'tyb-theme-editor') === false) {
         return;
     }
 
     wp_enqueue_script(
-        'talktoyourblog-theme-editor-admin-log',
-        TALKTOYOURBLOG_THEME_EDITOR_PLUGIN_URL . 'assets/admin/admin-log.js',
+        'tyb-theme-editor-admin-log',
+        TYB_THEME_EDITOR_PLUGIN_URL . 'assets/admin/admin-log.js',
         [],
-        TALKTOYOURBLOG_THEME_EDITOR_VERSION,
+        TYB_THEME_EDITOR_VERSION,
         true
     );
-    wp_localize_script('talktoyourblog-theme-editor-admin-log', 'TalkToYourBlogThemeEditorAdmin', [
+    wp_localize_script('tyb-theme-editor-admin-log', 'TybThemeEditorAdmin', [
         'ajaxUrl' => admin_url('admin-ajax.php'),
-        'errorLogNonce' => wp_create_nonce('talktoyourblog_theme_editor_error_log_refresh'),
+        'errorLogNonce' => wp_create_nonce('tyb_theme_editor_error_log_refresh'),
     ]);
 
     wp_add_inline_style('common', '
-        .talktoyourblog-admin-wrap { max-width: none; width: 100%; margin-right: 0; padding-right: 0; box-sizing: border-box; }
-        .talktoyourblog-admin-wrap .card { max-width: none !important; }
-        .talktoyourblog-admin-card { padding: 16px; margin: 16px 0 0; width: 100%; box-sizing: border-box; }
-        .talktoyourblog-admin-full { width: 100%; max-width: none; }
-        .talktoyourblog-admin-wrap .widefat { width: 100%; table-layout: auto; }
+        .tyb-admin-wrap { max-width: none; width: 100%; margin-right: 0; padding-right: 0; box-sizing: border-box; }
+        .tyb-admin-wrap .card { max-width: none !important; }
+        .tyb-admin-card { padding: 16px; margin: 16px 0 0; width: 100%; box-sizing: border-box; }
+        .tyb-admin-full { width: 100%; max-width: none; }
+        .tyb-admin-wrap .widefat { width: 100%; table-layout: auto; }
     ');
 }
 
-add_action('admin_enqueue_scripts', 'talktoyourblog_theme_editor_admin_enqueue_assets');
+add_action('admin_enqueue_scripts', 'tyb_theme_editor_admin_enqueue_assets');
 
-function talktoyourblog_theme_editor_read_file_tail($file_path, $max_bytes = 131072) {
+function tyb_theme_editor_read_file_tail($file_path, $max_bytes = 131072) {
     $file_path = (string) $file_path;
     $max_bytes = max(1024, (int) $max_bytes);
 
@@ -76,18 +76,18 @@ function talktoyourblog_theme_editor_read_file_tail($file_path, $max_bytes = 131
     return trim($content);
 }
 
-function talktoyourblog_theme_editor_get_error_log_preview($max_bytes = 131072) {
-    $log_file = talktoyourblog_theme_editor_get_error_log_file_path();
+function tyb_theme_editor_get_error_log_preview($max_bytes = 131072) {
+    $log_file = tyb_theme_editor_get_error_log_file_path();
     if (!file_exists($log_file)) {
         return [
-            'content' => __('Log file does not exist yet. Turn on debug logging and trigger an action to create the first entries.', 'talktoyourblog-theme-editor'),
+            'content' => __('Log file does not exist yet. Turn on debug logging and trigger an action to create the first entries.', 'tyb-theme-editor'),
             'exists' => false,
         ];
     }
 
-    $content = talktoyourblog_theme_editor_read_file_tail($log_file, $max_bytes);
+    $content = tyb_theme_editor_read_file_tail($log_file, $max_bytes);
     if ($content === '') {
-        $content = __('Log file is empty.', 'talktoyourblog-theme-editor');
+        $content = __('Log file is empty.', 'tyb-theme-editor');
     }
 
     return [
@@ -96,7 +96,7 @@ function talktoyourblog_theme_editor_get_error_log_preview($max_bytes = 131072) 
     ];
 }
 
-function talktoyourblog_theme_editor_get_log_level_badge_style($level) {
+function tyb_theme_editor_get_log_level_badge_style($level) {
     switch (strtoupper(trim((string) $level))) {
         case 'ERROR':
             return 'background:#fbeaea;color:#8b0000;border:1px solid #f1b5b5;';
@@ -111,7 +111,7 @@ function talktoyourblog_theme_editor_get_log_level_badge_style($level) {
     }
 }
 
-function talktoyourblog_theme_editor_parse_log_entries($content, $reverse = true) {
+function tyb_theme_editor_parse_log_entries($content, $reverse = true) {
     $raw_lines = preg_split('/\r\n|\r|\n/', (string) $content);
     $entries = [];
 
@@ -136,15 +136,15 @@ function talktoyourblog_theme_editor_parse_log_entries($content, $reverse = true
     return $entries;
 }
 
-function talktoyourblog_theme_editor_handle_refresh_error_log_ajax() {
+function tyb_theme_editor_handle_refresh_error_log_ajax() {
     if (!current_user_can('edit_themes')) {
-        wp_send_json_error(['message' => __('Insufficient permissions.', 'talktoyourblog-theme-editor')], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions.', 'tyb-theme-editor')], 403);
     }
 
-    check_ajax_referer('talktoyourblog_theme_editor_error_log_refresh', 'nonce');
+    check_ajax_referer('tyb_theme_editor_error_log_refresh', 'nonce');
 
-    $preview = talktoyourblog_theme_editor_get_error_log_preview();
-    $entries = talktoyourblog_theme_editor_parse_log_entries((string) ($preview['content'] ?? ''), true);
+    $preview = tyb_theme_editor_get_error_log_preview();
+    $entries = tyb_theme_editor_parse_log_entries((string) ($preview['content'] ?? ''), true);
 
     wp_send_json_success([
         'entries' => $entries,
@@ -153,120 +153,120 @@ function talktoyourblog_theme_editor_handle_refresh_error_log_ajax() {
     ]);
 }
 
-add_action('wp_ajax_talktoyourblog_theme_editor_refresh_error_log', 'talktoyourblog_theme_editor_handle_refresh_error_log_ajax');
+add_action('wp_ajax_tyb_theme_editor_refresh_error_log', 'tyb_theme_editor_handle_refresh_error_log_ajax');
 
-function talktoyourblog_theme_editor_render_log_page() {
+function tyb_theme_editor_render_log_page() {
     if (!current_user_can('edit_themes')) {
         return;
     }
 
     $notice = null;
 
-    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['talktoyourblog_theme_editor_log_action'])) {
-        check_admin_referer('talktoyourblog_theme_editor_log_action');
+    if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tyb_theme_editor_log_action'])) {
+        check_admin_referer('tyb_theme_editor_log_action');
 
-        $action = sanitize_key(wp_unslash((string) $_POST['talktoyourblog_theme_editor_log_action']));
+        $action = sanitize_key(wp_unslash((string) $_POST['tyb_theme_editor_log_action']));
 
         if ($action === 'save_settings') {
-            update_option('talktoyourblog_theme_editor_debug_logging', isset($_POST['debug_logging']) ? '1' : '0');
-            $notice = ['type' => 'success', 'message' => __('Settings saved.', 'talktoyourblog-theme-editor')];
+            update_option('tyb_theme_editor_debug_logging', isset($_POST['debug_logging']) ? '1' : '0');
+            $notice = ['type' => 'success', 'message' => __('Settings saved.', 'tyb-theme-editor')];
         } elseif ($action === 'clear') {
-            $log_file = talktoyourblog_theme_editor_get_error_log_file_path();
+            $log_file = tyb_theme_editor_get_error_log_file_path();
             $ok = @file_put_contents($log_file, '');
             $notice = $ok === false
-                ? ['type' => 'error', 'message' => __('Could not clear the log file.', 'talktoyourblog-theme-editor')]
-                : ['type' => 'success', 'message' => __('Log file was cleared.', 'talktoyourblog-theme-editor')];
+                ? ['type' => 'error', 'message' => __('Could not clear the log file.', 'tyb-theme-editor')]
+                : ['type' => 'success', 'message' => __('Log file was cleared.', 'tyb-theme-editor')];
         } elseif ($action === 'write_test') {
-            if (!talktoyourblog_theme_editor_logging_enabled()) {
-                $notice = ['type' => 'error', 'message' => __('Debug logging is off. Switch it on above first.', 'talktoyourblog-theme-editor')];
+            if (!tyb_theme_editor_logging_enabled()) {
+                $notice = ['type' => 'error', 'message' => __('Debug logging is off. Switch it on above first.', 'tyb-theme-editor')];
             } else {
-                talktoyourblog_theme_editor_log_info('Manual test log entry from the admin Error log page.', [
+                tyb_theme_editor_log_info('Manual test log entry from the admin Error log page.', [
                     'source' => 'admin_log_page',
                     'user_id' => get_current_user_id(),
                 ]);
-                $notice = ['type' => 'success', 'message' => __('Test log entry written. Use Refresh to load it.', 'talktoyourblog-theme-editor')];
+                $notice = ['type' => 'success', 'message' => __('Test log entry written. Use Refresh to load it.', 'tyb-theme-editor')];
             }
         }
     }
 
-    $log_file = talktoyourblog_theme_editor_get_error_log_file_path();
+    $log_file = tyb_theme_editor_get_error_log_file_path();
     $log_exists = file_exists($log_file);
     $log_readable = $log_exists && is_readable($log_file);
     $log_writable = wp_is_writable(dirname($log_file));
     $log_size = $log_exists ? (int) @filesize($log_file) : 0;
     $log_mtime = $log_exists ? (int) @filemtime($log_file) : 0;
 
-    $preview = talktoyourblog_theme_editor_get_error_log_preview();
-    $entries = talktoyourblog_theme_editor_parse_log_entries((string) ($preview['content'] ?? ''), true);
+    $preview = tyb_theme_editor_get_error_log_preview();
+    $entries = tyb_theme_editor_parse_log_entries((string) ($preview['content'] ?? ''), true);
 
     ?>
-    <div class="wrap talktoyourblog-admin-wrap">
-        <h1><?php esc_html_e('TalkToYourBlog Theme Editor', 'talktoyourblog-theme-editor'); ?></h1>
-        <p><?php esc_html_e('This plugin has no other settings -- it only creates and edits files inside its own "ai-*" folders in the active theme, through the WordPress Abilities API.', 'talktoyourblog-theme-editor'); ?></p>
+    <div class="wrap tyb-admin-wrap">
+        <h1><?php esc_html_e('TalkToYourBlog Theme Editor', 'tyb-theme-editor'); ?></h1>
+        <p><?php esc_html_e('This plugin has no other settings -- it only creates and edits files inside its own "ai-*" folders in the active theme, through the WordPress Abilities API.', 'tyb-theme-editor'); ?></p>
 
         <?php if ($notice): ?>
             <div class="notice notice-<?php echo esc_attr($notice['type']); ?> is-dismissible"><p><?php echo esc_html($notice['message']); ?></p></div>
         <?php endif; ?>
 
-        <div class="card talktoyourblog-admin-card talktoyourblog-admin-full">
-            <h2><?php esc_html_e('Error log', 'talktoyourblog-theme-editor'); ?></h2>
+        <div class="card tyb-admin-card tyb-admin-full">
+            <h2><?php esc_html_e('Error log', 'tyb-theme-editor'); ?></h2>
 
             <form method="post">
-                <?php wp_nonce_field('talktoyourblog_theme_editor_log_action'); ?>
-                <input type="hidden" name="talktoyourblog_theme_editor_log_action" value="save_settings" />
-                <label><input type="checkbox" name="debug_logging" value="1" <?php checked(talktoyourblog_theme_editor_logging_enabled()); ?> /> <?php esc_html_e('Write a debug log of every ability call (success or failure).', 'talktoyourblog-theme-editor'); ?></label>
-                <?php submit_button(__('Save', 'talktoyourblog-theme-editor'), 'secondary', '', false); ?>
-                <p class="description"><?php esc_html_e('Off by default. File contents and image bytes are never logged, only the ability name, the path and, on failure, the error.', 'talktoyourblog-theme-editor'); ?></p>
+                <?php wp_nonce_field('tyb_theme_editor_log_action'); ?>
+                <input type="hidden" name="tyb_theme_editor_log_action" value="save_settings" />
+                <label><input type="checkbox" name="debug_logging" value="1" <?php checked(tyb_theme_editor_logging_enabled()); ?> /> <?php esc_html_e('Write a debug log of every ability call (success or failure).', 'tyb-theme-editor'); ?></label>
+                <?php submit_button(__('Save', 'tyb-theme-editor'), 'secondary', '', false); ?>
+                <p class="description"><?php esc_html_e('Off by default. File contents and image bytes are never logged, only the ability name, the path and, on failure, the error.', 'tyb-theme-editor'); ?></p>
             </form>
 
             <div style="margin:14px 0;padding:10px 12px;border:1px solid #dcdcde;border-radius:8px;background:#f8f9fa;">
-                <strong><?php esc_html_e('Log diagnostics', 'talktoyourblog-theme-editor'); ?></strong>
+                <strong><?php esc_html_e('Log diagnostics', 'tyb-theme-editor'); ?></strong>
                 <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:6px;font-size:12px;">
-                    <span><strong><?php esc_html_e('Path:', 'talktoyourblog-theme-editor'); ?></strong> <code><?php echo esc_html($log_file); ?></code></span>
-                    <span><strong><?php esc_html_e('Exists:', 'talktoyourblog-theme-editor'); ?></strong> <?php echo $log_exists ? esc_html__('yes', 'talktoyourblog-theme-editor') : esc_html__('no', 'talktoyourblog-theme-editor'); ?></span>
-                    <span><strong><?php esc_html_e('Readable:', 'talktoyourblog-theme-editor'); ?></strong> <?php echo $log_readable ? esc_html__('yes', 'talktoyourblog-theme-editor') : esc_html__('no', 'talktoyourblog-theme-editor'); ?></span>
-                    <span><strong><?php esc_html_e('Writable dir:', 'talktoyourblog-theme-editor'); ?></strong> <?php echo $log_writable ? esc_html__('yes', 'talktoyourblog-theme-editor') : esc_html__('no', 'talktoyourblog-theme-editor'); ?></span>
-                    <span><strong><?php esc_html_e('Size:', 'talktoyourblog-theme-editor'); ?></strong> <?php echo esc_html((string) $log_size); ?> bytes</span>
-                    <span><strong><?php esc_html_e('Updated:', 'talktoyourblog-theme-editor'); ?></strong> <?php echo $log_mtime > 0 ? esc_html(gmdate('Y-m-d H:i:s', $log_mtime) . ' UTC') : '-'; ?></span>
+                    <span><strong><?php esc_html_e('Path:', 'tyb-theme-editor'); ?></strong> <code><?php echo esc_html($log_file); ?></code></span>
+                    <span><strong><?php esc_html_e('Exists:', 'tyb-theme-editor'); ?></strong> <?php echo $log_exists ? esc_html__('yes', 'tyb-theme-editor') : esc_html__('no', 'tyb-theme-editor'); ?></span>
+                    <span><strong><?php esc_html_e('Readable:', 'tyb-theme-editor'); ?></strong> <?php echo $log_readable ? esc_html__('yes', 'tyb-theme-editor') : esc_html__('no', 'tyb-theme-editor'); ?></span>
+                    <span><strong><?php esc_html_e('Writable dir:', 'tyb-theme-editor'); ?></strong> <?php echo $log_writable ? esc_html__('yes', 'tyb-theme-editor') : esc_html__('no', 'tyb-theme-editor'); ?></span>
+                    <span><strong><?php esc_html_e('Size:', 'tyb-theme-editor'); ?></strong> <?php echo esc_html((string) $log_size); ?> bytes</span>
+                    <span><strong><?php esc_html_e('Updated:', 'tyb-theme-editor'); ?></strong> <?php echo $log_mtime > 0 ? esc_html(gmdate('Y-m-d H:i:s', $log_mtime) . ' UTC') : '-'; ?></span>
                 </div>
                 <form method="post" style="margin-top:8px;display:flex;gap:8px;align-items:center;">
-                    <?php wp_nonce_field('talktoyourblog_theme_editor_log_action'); ?>
-                    <input type="hidden" name="talktoyourblog_theme_editor_log_action" value="write_test" />
-                    <?php submit_button(__('Write test log entry', 'talktoyourblog-theme-editor'), 'secondary', '', false); ?>
-                    <span class="description"><?php esc_html_e('Use this if the table below is empty, to verify the write/read pipeline.', 'talktoyourblog-theme-editor'); ?></span>
+                    <?php wp_nonce_field('tyb_theme_editor_log_action'); ?>
+                    <input type="hidden" name="tyb_theme_editor_log_action" value="write_test" />
+                    <?php submit_button(__('Write test log entry', 'tyb-theme-editor'), 'secondary', '', false); ?>
+                    <span class="description"><?php esc_html_e('Use this if the table below is empty, to verify the write/read pipeline.', 'tyb-theme-editor'); ?></span>
                 </form>
             </div>
 
             <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 12px;">
-                <label for="talktoyourblog_theme_editor_log_level_filter"><strong><?php esc_html_e('Level:', 'talktoyourblog-theme-editor'); ?></strong></label>
-                <select id="talktoyourblog_theme_editor_log_level_filter">
+                <label for="tyb_theme_editor_log_level_filter"><strong><?php esc_html_e('Level:', 'tyb-theme-editor'); ?></strong></label>
+                <select id="tyb_theme_editor_log_level_filter">
                     <?php foreach (['ALL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'] as $level): ?>
                         <option value="<?php echo esc_attr($level); ?>"><?php echo esc_html($level); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <label for="talktoyourblog_theme_editor_log_search"><strong><?php esc_html_e('Search:', 'talktoyourblog-theme-editor'); ?></strong></label>
-                <input type="text" id="talktoyourblog_theme_editor_log_search" class="regular-text" placeholder="<?php esc_attr_e('ability, path, error...', 'talktoyourblog-theme-editor'); ?>" />
-                <button type="button" class="button button-small" id="talktoyourblog_theme_editor_log_select_visible"><?php esc_html_e('Select visible', 'talktoyourblog-theme-editor'); ?></button>
-                <button type="button" class="button button-small" id="talktoyourblog_theme_editor_log_clear_selection"><?php esc_html_e('Clear selection', 'talktoyourblog-theme-editor'); ?></button>
-                <button type="button" class="button button-small" id="talktoyourblog_theme_editor_log_refresh"><?php esc_html_e('Refresh', 'talktoyourblog-theme-editor'); ?></button>
-                <button type="button" class="button button-small" id="talktoyourblog_theme_editor_log_copy_selected"><?php esc_html_e('Copy selected', 'talktoyourblog-theme-editor'); ?></button>
-                <button type="button" class="button button-small" id="talktoyourblog_theme_editor_log_copy_all"><?php esc_html_e('Copy all', 'talktoyourblog-theme-editor'); ?></button>
-                <span id="talktoyourblog_theme_editor_log_count" class="description" style="margin-left:auto;"></span>
+                <label for="tyb_theme_editor_log_search"><strong><?php esc_html_e('Search:', 'tyb-theme-editor'); ?></strong></label>
+                <input type="text" id="tyb_theme_editor_log_search" class="regular-text" placeholder="<?php esc_attr_e('ability, path, error...', 'tyb-theme-editor'); ?>" />
+                <button type="button" class="button button-small" id="tyb_theme_editor_log_select_visible"><?php esc_html_e('Select visible', 'tyb-theme-editor'); ?></button>
+                <button type="button" class="button button-small" id="tyb_theme_editor_log_clear_selection"><?php esc_html_e('Clear selection', 'tyb-theme-editor'); ?></button>
+                <button type="button" class="button button-small" id="tyb_theme_editor_log_refresh"><?php esc_html_e('Refresh', 'tyb-theme-editor'); ?></button>
+                <button type="button" class="button button-small" id="tyb_theme_editor_log_copy_selected"><?php esc_html_e('Copy selected', 'tyb-theme-editor'); ?></button>
+                <button type="button" class="button button-small" id="tyb_theme_editor_log_copy_all"><?php esc_html_e('Copy all', 'tyb-theme-editor'); ?></button>
+                <span id="tyb_theme_editor_log_count" class="description" style="margin-left:auto;"></span>
             </div>
 
             <?php if (empty($entries)): ?>
-                <p><?php esc_html_e('No log entries found in preview.', 'talktoyourblog-theme-editor'); ?></p>
+                <p><?php esc_html_e('No log entries found in preview.', 'tyb-theme-editor'); ?></p>
             <?php else: ?>
                 <div style="max-height:560px;overflow:auto;border:1px solid #dcdcde;border-radius:8px;background:#fff;">
                     <table class="widefat striped" style="margin:0;">
                         <thead style="position:sticky;top:0;background:#f6f7f7;z-index:1;">
-                            <tr><th style="width:38px;">#</th><th style="width:86px;"><?php esc_html_e('Level', 'talktoyourblog-theme-editor'); ?></th><th><?php esc_html_e('Entry', 'talktoyourblog-theme-editor'); ?></th></tr>
+                            <tr><th style="width:38px;">#</th><th style="width:86px;"><?php esc_html_e('Level', 'tyb-theme-editor'); ?></th><th><?php esc_html_e('Entry', 'tyb-theme-editor'); ?></th></tr>
                         </thead>
-                        <tbody id="talktoyourblog_theme_editor_log_rows">
+                        <tbody id="tyb_theme_editor_log_rows">
                             <?php $index = 1; foreach ($entries as $entry): $level = (string) $entry['level']; $line = (string) $entry['line']; ?>
-                                <tr class="talktoyourblog-theme-editor-log-row" data-level="<?php echo esc_attr($level); ?>" data-line="<?php echo esc_attr($line); ?>">
-                                    <td><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" class="talktoyourblog-theme-editor-log-select" /><span><?php echo esc_html((string) $index); ?></span></label></td>
-                                    <td><span style="display:inline-block;min-width:72px;text-align:center;font-weight:700;border-radius:999px;padding:2px 8px;<?php echo esc_attr(talktoyourblog_theme_editor_get_log_level_badge_style($level)); ?>"><?php echo esc_html($level); ?></span></td>
+                                <tr class="tyb-theme-editor-log-row" data-level="<?php echo esc_attr($level); ?>" data-line="<?php echo esc_attr($line); ?>">
+                                    <td><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" class="tyb-theme-editor-log-select" /><span><?php echo esc_html((string) $index); ?></span></label></td>
+                                    <td><span style="display:inline-block;min-width:72px;text-align:center;font-weight:700;border-radius:999px;padding:2px 8px;<?php echo esc_attr(tyb_theme_editor_get_log_level_badge_style($level)); ?>"><?php echo esc_html($level); ?></span></td>
                                     <td><code style="display:block;white-space:pre-wrap;word-break:break-word;color:#8b0000;"><?php echo esc_html($line); ?></code></td>
                                 </tr>
                             <?php $index++; endforeach; ?>
@@ -276,10 +276,10 @@ function talktoyourblog_theme_editor_render_log_page() {
             <?php endif; ?>
 
             <form method="post" style="margin-top:12px;">
-                <?php wp_nonce_field('talktoyourblog_theme_editor_log_action'); ?>
-                <input type="hidden" name="talktoyourblog_theme_editor_log_action" value="clear" />
-                <?php submit_button(__('Clear error log', 'talktoyourblog-theme-editor'), 'delete', '', false, ['id' => 'talktoyourblog_theme_editor_clear_error_log_btn']); ?>
-                <p class="description" style="color:#b00020;margin-top:8px;"><?php esc_html_e('Clearing logs is not recommended during active troubleshooting.', 'talktoyourblog-theme-editor'); ?></p>
+                <?php wp_nonce_field('tyb_theme_editor_log_action'); ?>
+                <input type="hidden" name="tyb_theme_editor_log_action" value="clear" />
+                <?php submit_button(__('Clear error log', 'tyb-theme-editor'), 'delete', '', false, ['id' => 'tyb_theme_editor_clear_error_log_btn']); ?>
+                <p class="description" style="color:#b00020;margin-top:8px;"><?php esc_html_e('Clearing logs is not recommended during active troubleshooting.', 'tyb-theme-editor'); ?></p>
             </form>
         </div>
     </div>

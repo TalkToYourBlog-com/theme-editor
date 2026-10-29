@@ -4,7 +4,7 @@ Tags: abilities api, mcp, ai, theme editor, developer tools
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,7 +58,7 @@ The edit is refused before it touches the file if the new content fails a syntax
 
 = Where is the history kept, and does it ever get deleted automatically? =
 
-As a private WordPress post type (`talktoyourblog_theme_revision`), the same mechanism core uses for post revisions -- not a separate file store. Nothing is pruned automatically in this version. Deleting the plugin (not just deactivating it) removes all of it.
+As a private WordPress post type (`tyb_theme_revision`), the same mechanism core uses for post revisions -- not a separate file store. Nothing is pruned automatically in this version. Deleting the plugin (not just deactivating it) removes all of it.
 
 == External services ==
 
@@ -74,6 +74,10 @@ The full, human-readable source of this plugin is public: https://github.com/Tal
 
 == Changelog ==
 
+= 0.5.0 =
+* Fixed a bug that made every edit of an existing file fail: the revision history's own post type name was 29 characters, past WordPress's 20-character limit, so every snapshot attempt failed with a database error under strict SQL mode. Shortened to `tyb_theme_revision`.
+* Shortened the plugin's internal prefix throughout (folder, main file, function and constant names, text domain, ability ids, CSS classes) from "talktoyourblog" to "tyb" for consistency and to avoid this class of length limit elsewhere. Nothing user-facing changes; the plugin's name and description stay the same.
+
 = 0.4.0 =
 * Added a built-in error log (TalkToYourBlog Theme Editor in the admin menu), modelled on Anonymous Sales Plugin's: off by default, logs every ability call's success or failure with its path and, on failure, the error -- never file or image content. Includes a live viewer with level/search filtering, select, copy and clear.
 
@@ -84,7 +88,7 @@ The full, human-readable source of this plugin is public: https://github.com/Tal
 * Added an upload-image ability (JPG/PNG/GIF/WebP, 5 MB limit, content checked against the claimed extension; SVG is refused).
 
 = 0.2.0 =
-* Renamed to TalkToYourBlog Theme Editor (directory slug: talktoyourblog-theme-editor), to match the renamed MFPro Blog MCP -> TalkToYourBlog. No files or revisions are affected.
+* Renamed to TalkToYourBlog Theme Editor (directory slug: tyb-theme-editor), to match the renamed MFPro Blog MCP -> TalkToYourBlog. No files or revisions are affected.
 * Added a "Report a bug or idea" link on the Plugins screen, pointing to the new central issue tracker.
 
 = 0.1.0 =

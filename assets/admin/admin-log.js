@@ -1,18 +1,18 @@
 // Error log screen: filters, refresh, copy, clear. Mirrors anonymousSalesPlugin's own log screen.
 (function () {
-  var ajaxUrl = window.TalkToYourBlogThemeEditorAdmin.ajaxUrl
-  var refreshNonce = window.TalkToYourBlogThemeEditorAdmin.errorLogNonce || ''
-  var levelFilter = document.getElementById('talktoyourblog_theme_editor_log_level_filter')
-  var searchInput = document.getElementById('talktoyourblog_theme_editor_log_search')
-  var rows = Array.prototype.slice.call(document.querySelectorAll('.talktoyourblog-theme-editor-log-row'))
-  var rowsContainer = document.getElementById('talktoyourblog_theme_editor_log_rows')
-  var countLabel = document.getElementById('talktoyourblog_theme_editor_log_count')
-  var selectVisibleBtn = document.getElementById('talktoyourblog_theme_editor_log_select_visible')
-  var clearSelectionBtn = document.getElementById('talktoyourblog_theme_editor_log_clear_selection')
-  var refreshBtn = document.getElementById('talktoyourblog_theme_editor_log_refresh')
-  var copySelectedBtn = document.getElementById('talktoyourblog_theme_editor_log_copy_selected')
-  var copyAllBtn = document.getElementById('talktoyourblog_theme_editor_log_copy_all')
-  var clearBtn = document.getElementById('talktoyourblog_theme_editor_clear_error_log_btn')
+  var ajaxUrl = window.TybThemeEditorAdmin.ajaxUrl
+  var refreshNonce = window.TybThemeEditorAdmin.errorLogNonce || ''
+  var levelFilter = document.getElementById('tyb_theme_editor_log_level_filter')
+  var searchInput = document.getElementById('tyb_theme_editor_log_search')
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.tyb-theme-editor-log-row'))
+  var rowsContainer = document.getElementById('tyb_theme_editor_log_rows')
+  var countLabel = document.getElementById('tyb_theme_editor_log_count')
+  var selectVisibleBtn = document.getElementById('tyb_theme_editor_log_select_visible')
+  var clearSelectionBtn = document.getElementById('tyb_theme_editor_log_clear_selection')
+  var refreshBtn = document.getElementById('tyb_theme_editor_log_refresh')
+  var copySelectedBtn = document.getElementById('tyb_theme_editor_log_copy_selected')
+  var copyAllBtn = document.getElementById('tyb_theme_editor_log_copy_all')
+  var clearBtn = document.getElementById('tyb_theme_editor_clear_error_log_btn')
 
   var escapeHtml = function (text) {
     return String(text || '').replace(/[&<>"']/g, function (char) {
@@ -30,7 +30,7 @@
   }
 
   var refreshRowsCache = function () {
-    rows = Array.prototype.slice.call(document.querySelectorAll('.talktoyourblog-theme-editor-log-row'))
+    rows = Array.prototype.slice.call(document.querySelectorAll('.tyb-theme-editor-log-row'))
   }
 
   var renderRows = function (entries) {
@@ -45,9 +45,9 @@
     entries.forEach(function (entry, index) {
       var level = String((entry && entry.level) || 'UNKNOWN').toUpperCase()
       var line = String((entry && entry.line) || '')
-      html += '<tr class="talktoyourblog-theme-editor-log-row" data-level="' + escapeHtml(level) + '" data-line="' + escapeHtml(line) + '">'
+      html += '<tr class="tyb-theme-editor-log-row" data-level="' + escapeHtml(level) + '" data-line="' + escapeHtml(line) + '">'
       html +=
-        '<td><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" class="talktoyourblog-theme-editor-log-select" /><span>' +
+        '<td><label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" class="tyb-theme-editor-log-select" /><span>' +
         String(index + 1) +
         '</span></label></td>'
       html +=
@@ -128,14 +128,14 @@
   if (selectVisibleBtn)
     selectVisibleBtn.addEventListener('click', function () {
       getVisibleRows().forEach(function (row) {
-        var box = row.querySelector('.talktoyourblog-theme-editor-log-select')
+        var box = row.querySelector('.tyb-theme-editor-log-select')
         if (box) box.checked = true
       })
     })
   if (clearSelectionBtn)
     clearSelectionBtn.addEventListener('click', function () {
       rows.forEach(function (row) {
-        var box = row.querySelector('.talktoyourblog-theme-editor-log-select')
+        var box = row.querySelector('.tyb-theme-editor-log-select')
         if (box) box.checked = false
       })
     })
@@ -144,7 +144,7 @@
       refreshBtn.disabled = true
       refreshBtn.textContent = 'Refreshing...'
       var body = new URLSearchParams()
-      body.append('action', 'talktoyourblog_theme_editor_refresh_error_log')
+      body.append('action', 'tyb_theme_editor_refresh_error_log')
       body.append('nonce', refreshNonce)
       fetch(ajaxUrl, {
         method: 'POST',
@@ -171,7 +171,7 @@
     copySelectedBtn.addEventListener('click', function () {
       var selectedLines = []
       rows.forEach(function (row) {
-        var box = row.querySelector('.talktoyourblog-theme-editor-log-select')
+        var box = row.querySelector('.tyb-theme-editor-log-select')
         if (box && box.checked) selectedLines.push(row.getAttribute('data-line') || '')
       })
       copyText(selectedLines.join('\n'))

@@ -6,7 +6,7 @@
 
 defined('ABSPATH') || exit;
 
-function talktoyourblog_theme_editor_can_shell_exec() {
+function tyb_theme_editor_can_shell_exec() {
     if (!function_exists('shell_exec') || !function_exists('escapeshellarg')) {
         return false;
     }
@@ -16,14 +16,14 @@ function talktoyourblog_theme_editor_can_shell_exec() {
 
 /**
  * @return true|WP_Error True when the content is syntactically valid (or could not be checked
- *                        at all, in which case a WP_Error with code talktoyourblog_theme_editor_lint_unavailable
+ *                        at all, in which case a WP_Error with code tyb_theme_editor_lint_unavailable
  *                        is returned so the caller can decide whether to proceed anyway).
  */
-function talktoyourblog_theme_editor_lint_php($content) {
-    if (talktoyourblog_theme_editor_can_shell_exec()) {
+function tyb_theme_editor_lint_php($content) {
+    if (tyb_theme_editor_can_shell_exec()) {
         // Plain tempnam(), not wp_tempnam() -- the latter lives in wp-admin/includes/file.php,
         // which is not loaded on a normal REST API request (how this check actually runs).
-        $tmp = tempnam(sys_get_temp_dir(), 'talktoyourblog-theme-editor-lint-');
+        $tmp = tempnam(sys_get_temp_dir(), 'tyb-theme-editor-lint-');
         if ($tmp) {
             file_put_contents($tmp, $content);
             $php_binary = defined('PHP_BINARY') && PHP_BINARY ? PHP_BINARY : 'php';
@@ -32,13 +32,13 @@ function talktoyourblog_theme_editor_lint_php($content) {
             if (is_string($output)) {
                 return strpos($output, 'No syntax errors detected') !== false
                     ? true
-                    : new WP_Error('talktoyourblog_theme_editor_syntax_error', trim($output));
+                    : new WP_Error('tyb_theme_editor_syntax_error', trim($output));
             }
         }
         // Fall through to the tokenizer check if the temp file or the shell call failed.
     }
 
-    return talktoyourblog_theme_editor_lint_php_with_tokenizer($content);
+    return tyb_theme_editor_lint_php_with_tokenizer($content);
 }
 
 /**
@@ -47,23 +47,23 @@ function talktoyourblog_theme_editor_lint_php($content) {
  * it will not catch every mistake `php -l` would -- but it is the best check available without
  * shelling out, and it is what this plugin falls back to on hosts where exec is disabled.
  */
-function talktoyourblog_theme_editor_lint_php_with_tokenizer($content) {
+function tyb_theme_editor_lint_php_with_tokenizer($content) {
     if (!defined('TOKEN_PARSE')) {
         // PHP < 8: no parse-mode tokenizer. Nothing meaningful left to check with; say so
         // rather than silently pretending the file is fine.
-        return new WP_Error('talktoyourblog_theme_editor_lint_unavailable', __('PHP syntax could not be checked on this server (no shell_exec and PHP is older than 8.0).', 'talktoyourblog-theme-editor'));
+        return new WP_Error('tyb_theme_editor_lint_unavailable', __('PHP syntax could not be checked on this server (no shell_exec and PHP is older than 8.0).', 'tyb-theme-editor'));
     }
 
     try {
         token_get_all($content, TOKEN_PARSE);
         return true;
     } catch (\ParseError $error) {
-        return new WP_Error('talktoyourblog_theme_editor_syntax_error', $error->getMessage());
+        return new WP_Error('tyb_theme_editor_syntax_error', $error->getMessage());
     }
 }
 
 /** CSS/JS get a much cheaper sanity check: balanced braces only, not a real parser either way. */
-function talktoyourblog_theme_editor_check_balanced_braces($content) {
+function tyb_theme_editor_check_balanced_braces($content) {
     $depth = 0;
     foreach (str_split($content) as $char) {
         if ($char === '{') {
@@ -71,19 +71,19 @@ function talktoyourblog_theme_editor_check_balanced_braces($content) {
         } elseif ($char === '}') {
             $depth--;
             if ($depth < 0) {
-                return new WP_Error('talktoyourblog_theme_editor_syntax_error', __('Unbalanced "}" in the file.', 'talktoyourblog-theme-editor'));
+                return new WP_Error('tyb_theme_editor_syntax_error', __('Unbalanced "}" in the file.', 'tyb-theme-editor'));
             }
         }
     }
     return $depth === 0
         ? true
-        : new WP_Error('talktoyourblog_theme_editor_syntax_error', __('Unbalanced "{" in the file.', 'talktoyourblog-theme-editor'));
+        : new WP_Error('tyb_theme_editor_syntax_error', __('Unbalanced "{" in the file.', 'tyb-theme-editor'));
 }
 
 /** @return true|WP_Error Dispatches to the right check for the file's extension. */
-function talktoyourblog_theme_editor_validate_content($extension, $content) {
+function tyb_theme_editor_validate_content($extension, $content) {
     if ($extension === 'php') {
-        return talktoyourblog_theme_editor_lint_php($content);
+        return tyb_theme_editor_lint_php($content);
     }
-    return talktoyourblog_theme_editor_check_balanced_braces($content);
+    return tyb_theme_editor_check_balanced_braces($content);
 }

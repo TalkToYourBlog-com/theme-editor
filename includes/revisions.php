@@ -7,12 +7,16 @@
 
 defined('ABSPATH') || exit;
 
-const TALKTOYOURBLOG_THEME_REVISION_POST_TYPE = 'talktoyourblog_theme_revision';
+// WordPress post types are capped at 20 characters (register_post_type() itself enforces this,
+// and wp_posts.post_type is a varchar(20) column) -- "tyb_theme_revision" is 29, so
+// this uses a short, internal-only slug instead. It is never shown anywhere (show_ui is false),
+// so the abbreviation costs nothing in practice.
+const TYB_THEME_REVISION_POST_TYPE = 'tyb_theme_revision';
 
-add_action('init', 'talktoyourblog_theme_editor_register_revision_post_type');
+add_action('init', 'tyb_theme_editor_register_revision_post_type');
 
-function talktoyourblog_theme_editor_register_revision_post_type() {
-    register_post_type(TALKTOYOURBLOG_THEME_REVISION_POST_TYPE, [
+function tyb_theme_editor_register_revision_post_type() {
+    register_post_type(TYB_THEME_REVISION_POST_TYPE, [
         'public' => false,
         'show_ui' => false,
         'show_in_menu' => false,
@@ -22,7 +26,7 @@ function talktoyourblog_theme_editor_register_revision_post_type() {
         'can_export' => false,
         'delete_with_user' => false,
         'supports' => ['title', 'editor', 'author'],
-        'capability_type' => 'talktoyourblog_theme_revision',
+        'capability_type' => 'tyb_theme_revision',
         'map_meta_cap' => false,
         // No role is ever granted these capabilities, so nothing outside this plugin's own
         // direct wp_insert_post()/get_posts() calls (which bypass the capability check, same
@@ -32,9 +36,9 @@ function talktoyourblog_theme_editor_register_revision_post_type() {
 }
 
 /** @return int|WP_Error The new revision's post ID. */
-function talktoyourblog_theme_editor_save_revision($relative_path, $content) {
+function tyb_theme_editor_save_revision($relative_path, $content) {
     $post_id = wp_insert_post([
-        'post_type' => TALKTOYOURBLOG_THEME_REVISION_POST_TYPE,
+        'post_type' => TYB_THEME_REVISION_POST_TYPE,
         'post_status' => 'private',
         'post_title' => $relative_path,
         'post_content' => $content,
@@ -45,21 +49,21 @@ function talktoyourblog_theme_editor_save_revision($relative_path, $content) {
         return $post_id;
     }
 
-    update_post_meta($post_id, '_talktoyourblog_path', $relative_path);
-    update_post_meta($post_id, '_talktoyourblog_hash', hash('sha256', $content));
+    update_post_meta($post_id, '_tyb_path', $relative_path);
+    update_post_meta($post_id, '_tyb_hash', hash('sha256', $content));
 
     return $post_id;
 }
 
 /** @return array<int, array{id:int, created_at:string, author:string, hash:string}> */
-function talktoyourblog_theme_editor_list_revisions($relative_path, $limit = 50) {
+function tyb_theme_editor_list_revisions($relative_path, $limit = 50) {
     $posts = get_posts([
-        'post_type' => TALKTOYOURBLOG_THEME_REVISION_POST_TYPE,
+        'post_type' => TYB_THEME_REVISION_POST_TYPE,
         'post_status' => 'private',
         'posts_per_page' => max(1, min(200, (int) $limit)),
         'orderby' => 'date',
         'order' => 'DESC',
-        'meta_key' => '_talktoyourblog_path',
+        'meta_key' => '_tyb_path',
         'meta_value' => $relative_path,
         'no_found_rows' => true,
     ]);
@@ -69,21 +73,21 @@ function talktoyourblog_theme_editor_list_revisions($relative_path, $limit = 50)
         return [
             'id' => $post->ID,
             'created_at' => mysql2date('c', $post->post_date_gmt, false),
-            'author' => $author ? $author->user_login : __('(deleted user)', 'talktoyourblog-theme-editor'),
-            'hash' => get_post_meta($post->ID, '_talktoyourblog_hash', true),
+            'author' => $author ? $author->user_login : __('(deleted user)', 'tyb-theme-editor'),
+            'hash' => get_post_meta($post->ID, '_tyb_hash', true),
         ];
     }, $posts);
 }
 
 /** @return array{path:string, content:string}|WP_Error */
-function talktoyourblog_theme_editor_get_revision($revision_id) {
+function tyb_theme_editor_get_revision($revision_id) {
     $post = get_post((int) $revision_id);
-    if (!$post || $post->post_type !== TALKTOYOURBLOG_THEME_REVISION_POST_TYPE) {
-        return new WP_Error('talktoyourblog_theme_editor_revision_not_found', __('That revision does not exist.', 'talktoyourblog-theme-editor'));
+    if (!$post || $post->post_type !== TYB_THEME_REVISION_POST_TYPE) {
+        return new WP_Error('tyb_theme_editor_revision_not_found', __('That revision does not exist.', 'tyb-theme-editor'));
     }
 
     return [
-        'path' => get_post_meta($post->ID, '_talktoyourblog_path', true),
+        'path' => get_post_meta($post->ID, '_tyb_path', true),
         'content' => $post->post_content,
     ];
 }

@@ -21,7 +21,9 @@ function talktoyourblog_theme_editor_can_shell_exec() {
  */
 function talktoyourblog_theme_editor_lint_php($content) {
     if (talktoyourblog_theme_editor_can_shell_exec()) {
-        $tmp = wp_tempnam('talktoyourblog-theme-editor-lint');
+        // Plain tempnam(), not wp_tempnam() -- the latter lives in wp-admin/includes/file.php,
+        // which is not loaded on a normal REST API request (how this check actually runs).
+        $tmp = tempnam(sys_get_temp_dir(), 'talktoyourblog-theme-editor-lint-');
         if ($tmp) {
             file_put_contents($tmp, $content);
             $php_binary = defined('PHP_BINARY') && PHP_BINARY ? PHP_BINARY : 'php';

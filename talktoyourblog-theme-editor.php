@@ -3,8 +3,8 @@
 /*
  * Plugin Name:       TalkToYourBlog Theme Editor
  * Plugin URI:        https://github.com/TalkToYourBlog-com/theme-editor
- * Description:       Optional companion for TalkToYourBlog. Lets an AI app read, edit and revert the active theme's own files through the WordPress Abilities API. Not required for TalkToYourBlog to work.
- * Version:           0.2.0
+ * Description:       Optional companion for TalkToYourBlog. Lets an AI app create and edit its own template folders and images inside the active theme through the WordPress Abilities API -- never the theme's own files. Not required for TalkToYourBlog to work.
+ * Version:           0.3.0
  * Requires at least: 6.9
  * Requires PHP:      7.4
  * Author:            Michal Futera
@@ -16,7 +16,7 @@
 
 defined('ABSPATH') || exit;
 
-define('TALKTOYOURBLOG_THEME_EDITOR_VERSION', '0.2.0');
+define('TALKTOYOURBLOG_THEME_EDITOR_VERSION', '0.3.0');
 define('TALKTOYOURBLOG_THEME_EDITOR_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TALKTOYOURBLOG_THEME_EDITOR_INCLUDES_DIR', TALKTOYOURBLOG_THEME_EDITOR_PLUGIN_DIR . 'includes');
 

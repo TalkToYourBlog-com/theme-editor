@@ -138,6 +138,17 @@ function tyb_theme_editor_file_hash($absolute_path) {
 }
 
 /**
+ * Turns a folder slug (e.g. "ai-landing-page") into a human-readable theme/plugin name
+ * ("AI Landing Page") for the Theme Name / Plugin Name header -- WordPress happily displays the
+ * slug as-is, but hyphens look wrong in a title shown throughout wp-admin.
+ */
+function tyb_theme_editor_display_name_from_slug($slug) {
+    $words = array_filter(preg_split('/[-_\s]+/', trim($slug)), 'strlen');
+    $words = array_map(fn ($word) => strtolower($word) === 'ai' ? 'AI' : ucfirst($word), $words);
+    return implode(' ', $words) ?: $slug;
+}
+
+/**
  * The seed files for a brand new classic WordPress theme: real, minimal, working code -- not
  * just a style.css stub. $slug is the folder/theme name (e.g. "ai-landing-page"); $fn_prefix is
  * the same string with hyphens turned to underscores, safe to use in PHP identifiers.
@@ -145,8 +156,17 @@ function tyb_theme_editor_file_hash($absolute_path) {
  * @return array<string, string> relative path (inside the theme) => file content
  */
 function tyb_theme_editor_starter_theme_files($slug, $fn_prefix) {
+    $display_name = tyb_theme_editor_display_name_from_slug($slug);
+
     return [
-        'style.css' => "/*\nTheme Name: {$slug}\nVersion: 1.0.0\n*/\n",
+        'style.css' => <<<CSS
+/*
+Theme Name: {$display_name}
+Description: Independent WordPress theme created by an AI app through TalkToYourBlog (talktoyourblog.com).
+Version: 1.0.0
+*/
+
+CSS,
         'functions.php' => <<<PHP
 <?php
 defined('ABSPATH') || exit;
@@ -242,6 +262,16 @@ function tyb_theme_editor_create_theme_folder($name) {
         if (!file_exists($file_path)) {
             file_put_contents($file_path, $content);
             $created_files[] = $relative;
+        }
+    }
+
+    // A starting screenshot so the new theme doesn't show up blank in Appearance > Themes --
+    // the AI app (or the site admin) can replace it with upload-image at any time.
+    $screenshot_path = $path . '/screenshot.png';
+    if (!file_exists($screenshot_path)) {
+        $default_screenshot = TYB_THEME_EDITOR_PLUGIN_DIR . 'assets/images/screenshot-default.png';
+        if (file_exists($default_screenshot) && copy($default_screenshot, $screenshot_path)) {
+            $created_files[] = 'screenshot.png';
         }
     }
 

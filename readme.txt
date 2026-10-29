@@ -4,7 +4,7 @@ Tags: abilities api, mcp, ai, theme editor, developer tools
 Requires at least: 6.9
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.6.1
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ TalkToYourBlog connects an AI app (Claude, ChatGPT, Cursor and others) to a Word
 
 What TalkToYourBlog's REST-API approach cannot reach is theme code -- WordPress doesn't expose PHP/CSS/JS files for editing over its core REST API. This plugin adds exactly that, but on purpose does not hand the AI any existing theme, including whichever one is active: it can only create brand new themes of its own, each named with the `ai-` prefix (e.g. `ai-landing-page`), as an independent folder directly under `wp-content/themes`. This is nine WordPress Abilities (the `wp-abilities/v1` mechanism built into WordPress core since 6.9 -- the same one plugins like Rank Math or AIOSEO use to expose their own features to AI apps):
 
-* **Create a theme** -- a new `ai-*` folder under `wp-content/themes`, seeded with a minimal but complete, working classic theme (`style.css`, `functions.php`, `header.php`, `footer.php`, `index.php`) so it is listed under Appearance > Themes and already renders, instead of an empty folder.
+* **Create a theme** -- a new `ai-*` folder under `wp-content/themes`, seeded with a minimal but complete, working classic theme (`style.css`, `functions.php`, `header.php`, `footer.php`, `index.php`, plus a starting `screenshot.png`) so it is listed under Appearance > Themes, already renders and shows a preview, instead of an empty folder. The Theme Name comes from the folder name (e.g. "ai-landing-page" becomes "AI Landing Page"); all of it can be changed afterwards.
 * **List themes** -- every `ai-*` theme created so far.
 * **List files** -- every PHP/CSS/JS/image file inside those themes, with size and last-modified time.
 * **Read a file** -- its content plus a hash, so a later edit can detect if the file changed in between (PHP/CSS/JS only).
@@ -80,6 +80,9 @@ No data about the site or its users is sent anywhere by this plugin. Revisions s
 The full, human-readable source of this plugin is public: https://github.com/TalkToYourBlog-com/theme-editor.
 
 == Changelog ==
+
+= 1.0.0 =
+* create-theme now turns the folder name into a readable Theme Name (e.g. "ai-landing-page" becomes "AI Landing Page") and adds a Description crediting TalkToYourBlog (talktoyourblog.com), and seeds a starting screenshot.png so the new theme doesn't show up blank in Appearance > Themes. All of it can be changed afterwards with update-file / upload-image.
 
 = 0.6.1 =
 * Fixed restore-revision failing to undo a delete-file call ("That file does not exist"): it now re-creates a missing file instead of requiring the file to already exist.

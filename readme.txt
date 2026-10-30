@@ -4,7 +4,7 @@ Tags: abilities api, mcp, ai, theme editor, developer tools
 Requires at least: 6.9
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,9 @@ No data about the site or its users is sent anywhere by this plugin. Revisions s
 The full, human-readable source of this plugin is public: https://github.com/TalkToYourBlog-com/theme-editor.
 
 == Changelog ==
+
+= 1.0.2 =
+* Added automatic updates from this plugin's GitHub Releases (this plugin isn't in the WordPress.org directory, so WordPress never checked for its updates on its own before this).
 
 = 1.0.1 =
 * Fixed every issue flagged by the official Plugin Check tool ahead of the WordPress.org submission: replaced `unlink()` with `wp_delete_file()`, replaced heredoc strings with plain PHP strings, switched a revision lookup from `meta_key`/`meta_value` to `meta_query`, updated "Tested up to", and shortened the short description.
